@@ -1,0 +1,12 @@
+#!/bin/bash
+# mydig - clatta - 2010-10-01
+# Just a shortcut for a short answer from dig
+input="$@"
+digout=`dig $input | grep -A9999999 'ANSWER SEC' | grep -v ';'`
+if [ -z "$digout" ]
+    then
+        echo "No Answer for $input"
+    else
+        echo "$digout"
+fi
+
