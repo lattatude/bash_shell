@@ -1,0 +1,22 @@
+#! /bin/bash
+# curli - CLATTA - 2013-03-10
+# Updated - CLATTA - 2014-06-20 - added var and if for agent
+# Updated - CLATTA - 2015-04-10 - changed from HEAD req to a GET with dump header (D) 
+# CURL SHORTCUT TO FOLLOW A URL AND GET ALL HEADERS ALONG THE WAY,
+# THEN PRINT THE FINAL URL
+if [ -z "$2" ]
+    then
+        agent='DEVRY_ADMIN_CURLI'
+    else
+        agent="$2"
+fi
+if [ -z "$3" ]
+    then
+        auth=""
+    else
+        auth="--user user:pass $3"
+fi
+echo $1
+curl -A "'$agent'" -s -L -D  - $1 -o /dev/null -w '%{url_effective}'
+echo ""
+echo ""
