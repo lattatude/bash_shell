@@ -1,0 +1,15 @@
+#!/bin/bash
+# USES CURL TO SEARCH TWITTER AND BRING BACK TEXT RESULTS
+# REQUIRES CURL, SED
+twitter_url='https://twitter.com/search?q='
+twitter_query=$@
+#
+urlquery=`echo $twitter_query | sed 's/#/%23/g;s/ /+/g;s/@/%40/g'`
+# TESTING
+#echo "$twitter_url$urlquery"; exit
+#
+# RUN THE QUERY AND PARSE OUT RESULTS
+curl "$twitter_url$urlquery" 2>/dev/null \
+| grep -e 'tweet-text' -e 'username js-action-profile-name' -e '_timestamp js-short-timestamp' \
+| sed -e 's/<[^>]*>//g;s/&rlm;/\n/g;s/pic.twitter.com/http:\/\/pic.twitter.com/g' \
+| sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/&nbsp/ /g'
