@@ -1,5 +1,6 @@
 #!/bin/bash
-# USES CURL TO SEARCH TWITTER AND BRING BACK TEXT RESULTS
+# twitter - clatta - 2016-01-18
+# Purpose: USES CURL TO SEARCH TWITTER AND BRING BACK TEXT RESULTS
 # REQUIRES CURL, SED
 twitter_url='https://twitter.com/search?q='
 twitter_query=$@
