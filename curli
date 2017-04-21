@@ -19,7 +19,6 @@ if [ -z "$3" ]
 fi
 url=$( echo "$1" | sed 's/ /%20/g' );
 echo "${url}"
-#curl $url -A "'$agent'" "$headers"  -s -L -I -w '%{url_effective}'
 curl -A "'$agent'" -s -L -D  - "${url}" -o /dev/null -w '%{url_effective}'
 echo ""
 echo ""
