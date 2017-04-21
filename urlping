@@ -1,0 +1,111 @@
+#!/bin/bash
+#
+# URLPING v 1.6
+# USES CURL TO GET STATUS CODE OF PAGE
+# CREATED - CLATTA - 2013-08-22 - First version
+# Updated - CLATTA - 2013-09-17 - Added sleepfor perameter to allow longer sleep between pings
+# Updated - CLATTA - 2015-04-10 - changed from HEAD req to a GET with dump header (D) 
+# Updated - CLATTA - 2016-08-25 - added perameters and repeat (-r) option, which actually means norepeat
+# Updated - CLATTA - 2016-09-07 - Removed curl option 'D' (dump header) because it never really belonged 
+#								  there, added peram for user agent, moved termination trap
+# Updated - CLATTA - 2016-11-01 - Changed curl to output headers only
+#
+#
+#IF NO PERAMS THEN PRINT HELP
+if [[ -z "${1}" ]]
+then
+	echo "USAGE:"
+	echo "urlping [url] (without any options first peram can be the URL)"
+	echo "urlping [-u url] [-s seconds] [-r count]"
+	echo "Options:"
+	echo "	-u		Send request to this URL"
+	echo "	-s		Seconds to sleep between requests"
+	echo "	-r		No repeat, only send one request"
+	echo ""
+	exit 1;
+fi
+#IF 2ND OPTION EXISTS THEN GET OPS
+if [[ -z "${2}" ]]
+then
+	# GET URL FROM FIRST PERAM
+	url="${1}"
+else
+	while getopts s:u:r:a option
+	do
+			case "${option}"
+			in
+					s) sleepfor=${OPTARG};;
+					u) url="${OPTARG}";;
+					r) repeat=1;;
+					a) useragent="${OPTARG}";;
+			esac
+	done
+fi
+# GET SLEEP FOR PERAM, IF IT EXISTS
+if [[ -z "$sleepfor" ]]
+    then
+        sleepfor=1
+    else
+        sleepfor=${sleepfor}
+fi
+# GET REPEAT NUM PERAM, IF IT EXISTS
+if [[ -z "$repeat" ]]
+    then
+        repeat=0
+    else
+        repeat=${repeat}
+fi
+# GET USER AGENT PERAM, IF IT EXISTS
+if [[ -z "$useragent" ]]
+    then
+        useragent='DEVRY_ADMIN_URLPING'
+    else
+        useragent=${useragent}
+fi
+# SET SOME COUNTER VARS
+count=0
+fail=0
+responded=0
+# SET SOME OUTPUT COLOR VARS
+colorred='\e[0;31m'
+coloryellow='\e[0;33m'
+colornone='\e[0m'
+#
+# DEFINE THE EXIT FUNCTION
+set -e
+function report {
+	echo "Responded $responded"
+	echo "Failed    $fail "
+}
+#
+# EXECUTE AND REPEAT FOREVER...
+while true
+do
+	# BUILD CURL COMMAND TO GET REPONSE CODE
+	datetime=`date +"%Y%m%d%H%M%S"`
+	response=`curl -I -s -L -A "${useragent}" -w '%{http_code} %{time_namelookup} x%{num_redirects} %{time_redirect} %{time_connect} %{time_total} %{url_effective}' --stderr /dev/null "${url}" | tail -1`
+	responsecode=`echo ${response} | awk '{print $1}'`
+	# IF THERE WAS NO RESPONSE, SAY SO, OTHERWISE PRINT OUTPUT
+	if [[ ${responsecode} == "000" ]] 
+		then
+			echo -e "${colorred}${datetime}" "${url}" "${FAILED}${colornone}"
+			fail=$((fail+1))
+	elif [[ ${responsecode} == "200" ]]
+		then
+			echo -e "${colornone}${datetime} ${response}${colornone}"
+			responded=$((responded+1))
+		else
+			echo -e "${coloryellow}${datetime} ${response}${colornone}"
+			responded=$((responded+1))
+	fi
+	# TRAP MANUAL EXIT, WHICH IS PROBABLY THE ONLY WAY THIS STOPS REPEATING
+	trap report INT
+	#IF REPEAT IS 1 THEN STOP HERE
+	if [[ ${repeat} == 1 ]]
+	then
+		#STOP HERE
+		exit 0;
+	fi
+	#SLEEP SPECIFIED COUNT
+	sleep ${sleepfor};
+done
