@@ -1,24 +1,26 @@
 #! /bin/bash
 # curli - CLATTA - 2013-03-10
+# CURL SHORTCUT TO FOLLOW A URL AND GET ALL HEADERS, PRINT THE FINAL URL
 # Updated - CLATTA - 2014-06-20 - added var and if for agent
 # Updated - CLATTA - 2015-04-10 - changed from HEAD req to a GET with dump header (D) 
 # Updated - CLATTA - 2016-10-10 - added url encoding of spaces
-# CURL SHORTCUT TO FOLLOW A URL AND GET ALL HEADERS ALONG THE WAY,
-# THEN PRINT THE FINAL URL
-if [ -z "$2" ]
+# Updated - CLATTA - 2017-06-20 - simplified everything, made second peram any extra cURL opts
+#
+# DEFAULT USER AGENT
+agent='DEVRY_ADMIN_CURLI';
+#VALIDATION OF URL INPUT
+if [ -z "$1" ]
     then
-        agent='ADMIN_CURLI-20170421082518'
-    else
-        agent="$2"
+        echo 'Usage: curli [URL] [USERAGENT] [OTHER CURL OPTIONS]';
+		exit;
 fi
-if [ -z "$3" ]
-    then
-        headers=""
-    else
-        headers="$3"
-fi
+#VALIDATION OF INPUT FOR OTHER OPTIONS
+[ ! -z "$2" ] && options="$2" || options=""
+#URL ENCODE SPACES
 url=$( echo "$1" | sed 's/ /%20/g' );
+#PRINT URL
 echo "${url}"
-curl -A "'$agent'" -s -L -D  - "${url}" -o /dev/null -w '%{url_effective}'
+#RUN cURL
+curl -A "'$agent'" -s -L -D  - "${url}" -o /dev/null -w '%{url_effective}' "${options}"
 echo ""
 echo ""
