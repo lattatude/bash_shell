@@ -9,19 +9,23 @@
 # Updated - CLATTA - 2016-09-07 - Removed curl option 'D' (dump header) because it never really belonged 
 #								  there, added peram for user agent, moved termination trap
 # Updated - CLATTA - 2016-11-01 - Changed curl to output headers only
+# Updated - CLATTA - 2017-08-01 - Added useragent_default configurable value
 #
+#
+# CONFIGURABLE
+useragent_default='ADMIN_URLPING';
 #
 #IF NO PERAMS THEN PRINT HELP
 if [[ -z "${1}" ]]
 then
-	echo "USAGE:"
-	echo "urlping [url] (without any options first peram can be the URL)"
-	echo "urlping [-u url] [-s seconds] [-r count]"
-	echo "Options:"
-	echo "	-u		Send request to this URL"
-	echo "	-s		Seconds to sleep between requests"
-	echo "	-r		No repeat, only send one request"
-	echo ""
+	echo "USAGE:";
+	echo "urlping [url] (without any options first peram can be the URL)";
+	echo "urlping [-u url] [-s seconds] [-r count]";
+	echo "Options:";
+	echo "	-u		Send request to this URL";
+	echo "	-s		Seconds to sleep between requests";
+	echo "	-r		No repeat, only send one request";
+	echo "";
 	exit 1;
 fi
 #IF 2ND OPTION EXISTS THEN GET OPS
@@ -44,38 +48,38 @@ fi
 # GET SLEEP FOR PERAM, IF IT EXISTS
 if [[ -z "$sleepfor" ]]
     then
-        sleepfor=1
+        sleepfor=1;
     else
-        sleepfor=${sleepfor}
+        sleepfor=${sleepfor};
 fi
 # GET REPEAT NUM PERAM, IF IT EXISTS
 if [[ -z "$repeat" ]]
     then
-        repeat=0
+        repeat=0;
     else
-        repeat=${repeat}
+        repeat=${repeat};
 fi
 # GET USER AGENT PERAM, IF IT EXISTS
 if [[ -z "$useragent" ]]
     then
-        useragent='DEVRY_ADMIN_URLPING'
+        useragent=${useragent_default};
     else
-        useragent=${useragent}
+        useragent=${useragent};
 fi
 # SET SOME COUNTER VARS
-count=0
-fail=0
-responded=0
+count=0;
+fail=0;
+responded=0;
 # SET SOME OUTPUT COLOR VARS
-colorred='\e[0;31m'
-coloryellow='\e[0;33m'
-colornone='\e[0m'
+colorred='\e[0;31m';
+coloryellow='\e[0;33m';
+colornone='\e[0m';
 #
 # DEFINE THE EXIT FUNCTION
 set -e
 function report {
-	echo "Responded $responded"
-	echo "Failed    $fail "
+	echo "Responded $responded";
+	echo "Failed    $fail ";
 }
 #
 # EXECUTE AND REPEAT FOREVER...
@@ -88,15 +92,15 @@ do
 	# IF THERE WAS NO RESPONSE, SAY SO, OTHERWISE PRINT OUTPUT
 	if [[ ${responsecode} == "000" ]] 
 		then
-			echo -e "${colorred}${datetime}" "${url}" "${FAILED}${colornone}"
-			fail=$((fail+1))
+			echo -e "${colorred}${datetime}" "${url}" "${FAILED}${colornone}";
+			fail=$((fail+1));
 	elif [[ ${responsecode} == "200" ]]
 		then
-			echo -e "${colornone}${datetime} ${response}${colornone}"
-			responded=$((responded+1))
+			echo -e "${colornone}${datetime} ${response}${colornone}";
+			responded=$((responded+1));
 		else
-			echo -e "${coloryellow}${datetime} ${response}${colornone}"
-			responded=$((responded+1))
+			echo -e "${coloryellow}${datetime} ${response}${colornone}";
+			responded=$((responded+1));
 	fi
 	# TRAP MANUAL EXIT, WHICH IS PROBABLY THE ONLY WAY THIS STOPS REPEATING
 	trap report INT
