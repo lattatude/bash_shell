@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# URLPING v 1.6
+# URLPING v 1.7
 # USES CURL TO GET STATUS CODE OF PAGE
 # CREATED - CLATTA - 2013-08-22 - First version
 # Updated - CLATTA - 2013-09-17 - Added sleepfor perameter to allow longer sleep between pings
