@@ -1,0 +1,40 @@
+#! /bin/bash
+# CHECKS URL FOR SSL DATE AND DOMAIN
+# REQUIRES OPENSSL
+# v0.1 CLATTA 2009-10-20
+# V0.6 CLATTA 2017-01-27 REMOVED 'ALL' OPTION, ADDED MULTIPLE NAMES INPUT
+if [[ -z "$1" ]]
+    then
+        echo "Enter a domain to test for SSL certifiate";
+		echo "use ALL permeter to show all domains on SAN cert";
+    else
+		for name in $@
+		do
+			#start
+			#PRINT ALL THE DOMAINS
+			output=$(echo | openssl s_client -connect "${name}:443" 2>/dev/null | openssl x509 -dates -noout -text 2>/dev/null | grep -e DNS -e 'notBefore=' -e 'notAfter=');
+			#PRINT SOME SPECIFIC INFO
+			notBefore=$(echo "${output}" | grep 'notBefore=');
+			notAfter=$(echo "${output}" | grep 'notAfter=');
+			domain=$(echo "${output}" | grep DNS | grep -oP "${name}");
+			if [[ ${domain} ]]
+			then
+				echo "${domain} OK (${notBefore} ${notAfter})";
+			else
+				if [[ ${notBefore} ]]
+				then
+					echo "${name} DOMAIN NOT FOUND IN CERT" "(${notBefore} ${notAfter})";
+				else
+					echo "${name} DOMAIN NOT FOUND AND NO CERT EXISTS ON IP";
+				fi
+			fi
+		#end
+		done
+fi
+
+
+
+
+
+
+
