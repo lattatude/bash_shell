@@ -1,0 +1,17 @@
+#! /bin/bash
+# CHECKS URL FOR SSL DATE AND DOMAIN
+# REQUIRES sslcheck (script with OPENSSL) and digit (script with DIG)
+# v0.1 CLATTA 2017-08-11
+#
+#
+if [[ -z "$1" ]]
+    then
+        echo "Enter a domain to test for SSL certifiate";
+		echo "use ALL permeter to show all domains on SAN cert";
+    else
+		domains=${@}
+		for d in $domains
+		do
+			echo ${d},$(digit ${d} | awk '{print $5}'),$(sslcheck ${d} | awk '{print $2}')
+		done
+fi
