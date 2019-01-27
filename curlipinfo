@@ -1,0 +1,22 @@
+#! /bin/bash
+# 2013-07-19 CLATTA
+# This just uses curl to query the ipinfo database (www.ipinfodb.com)
+# Requires a valid registered ipinfo key
+#
+# API ARGUMENTS (www.ipinfodb.com)
+# Parameter Required Default    Value
+# --------- -------- -------    -----
+# key       Yes      <empty>    API key provided with your free account.
+# ip        No 	     Client IP  IP address
+# format    No 	     raw        raw, xml, json
+# callback  No 	     <empty>    Required when using json callback.
+#
+# IPinfo Key - need to get this from www.ipinfodb.com
+ipinfokey='';
+# Use the first argument as the IP
+ipaddr="${1}";
+#
+ipinfoURL="http://api.ipinfodb.com/v3/ip-city/?key=${ipinfokey}&ip=${ipaddr}";
+# 
+# Run the cURL command with above information & registered ipinfo API key 
+curl ${ipinfoURL};
