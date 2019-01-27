@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# URLPING v 1.8
+# URLPING v 1.9
 # USES CURL TO GET STATUS CODE OF PAGE
 # CREATED - CLATTA - 2013-08-22 - First version
 # Updated - CLATTA - 2013-09-17 - Added sleepfor perameter to allow longer sleep between pings
@@ -11,6 +11,7 @@
 # Updated - CLATTA - 2016-11-01 - Changed curl to output headers only
 # Updated - CLATTA - 2017-08-01 - Added useragent_default configurable value
 # Updated - CLATTA - 2017-08-08 - Removed most repeat logic, -r no longer accepts a value
+# Updated - CLATTA - 2018-01-16 - Added headings and needed spacing for columns look
 #
 #
 # CONFIGURABLE
@@ -26,6 +27,7 @@ then
 	echo "	-u		Send request to this URL";
 	echo "	-s		Seconds to sleep between requests";
 	echo "	-r		No repeat, only send one request";
+	echo "	-h		No headings";
 	echo "";
 	exit 1;
 fi
@@ -35,7 +37,7 @@ then
 	# GET URL FROM FIRST PERAM
 	url="${1}"
 else
-	while getopts s:u:ra option
+	while getopts s:u:rah option
 	do
 			case "${option}"
 			in
@@ -43,6 +45,7 @@ else
 					u) url="${OPTARG}";;
 					r) repeat=1;;
 					a) useragent="${OPTARG}";;
+					h) noheadings=1;;
 			esac
 	done
 fi
@@ -76,12 +79,17 @@ function report {
 	echo "Failed    ${fail} ";
 }
 #
+# USE HEADINGS
+if [[ -z "${noheadings}" ]]
+    then
+        echo "TIMESTAMP      CODE TIME_DNS REDIRS/TIME CONNECT  TOTAL    URL_EFFECTIVE";
+fi
 # EXECUTE AND REPEAT FOREVER...
 while true
 do
 	# BUILD CURL COMMAND TO GET REPONSE CODE
 	datetime=`date +"%Y%m%d%H%M%S"`
-	response=`curl -I -s -L -A "${useragent}" -w '%{http_code} %{time_namelookup} x%{num_redirects} %{time_redirect} %{time_connect} %{time_total} %{url_effective}' --stderr /dev/null "${url}" | tail -1`
+	response=`curl -I -s -L -A "${useragent}" -w '%{http_code}  %{time_namelookup} x%{num_redirects} %{time_redirect} %{time_connect} %{time_total} %{url_effective}' --stderr /dev/null "${url}" | tail -1`
 	responsecode=`echo ${response} | awk '{print $1}'`
 	# IF THERE WAS NO RESPONSE, SAY SO, OTHERWISE PRINT OUTPUT
 	if [[ ${responsecode} == "000" ]] 
