@@ -5,22 +5,26 @@
 # Updated - CLATTA - 2015-04-10 - changed from HEAD req to a GET with dump header (D) 
 # Updated - CLATTA - 2016-10-10 - added url encoding of spaces
 # Updated - CLATTA - 2017-06-20 - simplified everything, made second peram any extra cURL opts
+# Updated - CLATTA - 2018-01-16 - added times to response output
+# Updated - CLATTA - 2018-04-09 - added more usage to include basic command this is running
 #
 # DEFAULT USER AGENT
-agent='DEVRY_ADMIN_CURLI';
+agent='ADMIN_CURLI';
 #VALIDATION OF URL INPUT
-if [ -z "$1" ]
+if [[ -z "$1" ]]
     then
         echo 'Usage: curli [URL] [USERAGENT] [OTHER CURL OPTIONS]';
+		echo 'Also try:  curl -sLD - -o /dev/null [URL]';
 		exit;
 fi
 #VALIDATION OF INPUT FOR OTHER OPTIONS
-[ ! -z "$2" ] && options="$2" || options=""
+[[ ! -z "${2}" ]] && options="${2}" || options="";
+[[ "${options}" == "gzip" ]] && options="-H 'accept-encoding: gzip'";
 #URL ENCODE SPACES
 url=$( echo "$1" | sed 's/ /%20/g' );
 #PRINT URL
-echo "${url}"
+echo -e "${url} \n"
 #RUN cURL
-curl -A "'$agent'" -s -L -D  - "${url}" -o /dev/null -w '%{url_effective}' "${options}"
+curl -A "${agent}" -sLD - -o /dev/null "${url}" -w '%{url_effective}\nName Lookup: %{time_namelookup} \nConnect: %{time_connect} \nPretransfer: %{time_pretransfer} \nRedirect: %{time_redirect}\nStart Transfer: %{time_starttransfer}\nTotal: %{time_total}' "${options}" | grep -v "0.000000"
 echo ""
 echo ""
