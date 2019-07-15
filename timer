@@ -1,0 +1,38 @@
+#!/bin/bash
+# CLATTA - 2013-03-24
+# COUNTS DOWN FROM WHATEVER NUMBER ENTERED
+#
+mssg="TIME IS UP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+i=10
+if [ -z "${1}" ]
+    then
+        #NO ARGS, DEFAULT TO
+        i=10
+    else
+        i=${1}
+fi
+if [ -z "${2}" ]
+    then
+        #NO ARGS, DEFAULT TO
+        saythis="Times Up"
+    else
+        saythis=${2}
+fi
+#CLEAR THE SCREEN
+printf "\033c"
+# START THE COUNTDOWN
+while [ ${i} -gt 0 ]
+        do echo $i seconds remaining
+        i=`expr $i - 1`
+        sleep 1
+        #CLEAR THE SCREEN
+        printf "\033c"
+done
+#BLINK THE MSSG TEXT AND SOUND THE TONE
+printf "\033[33;5m$mssg\033[0m\n%.0s" {1..10}
+#yes > /dev/dsp
+while true
+do
+        say "Times Up"
+        sleep 2
+done
