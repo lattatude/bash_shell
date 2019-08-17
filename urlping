@@ -4,14 +4,15 @@
 # USES CURL TO GET STATUS CODE OF PAGE
 # CREATED - CLATTA - 2013-08-22 - First version
 # Updated - CLATTA - 2013-09-17 - Added sleepfor perameter to allow longer sleep between pings
-# Updated - CLATTA - 2015-04-10 - changed from HEAD req to a GET with dump header (D) 
+# Updated - CLATTA - 2015-04-10 - changed from HEAD req to a GET with dump header (D)
 # Updated - CLATTA - 2016-08-25 - added perameters and repeat (-r) option, which actually means norepeat
-# Updated - CLATTA - 2016-09-07 - Removed curl option 'D' (dump header) because it never really belonged 
+# Updated - CLATTA - 2016-09-07 - Removed curl option 'D' (dump header) because it never really belonged
 #								  there, added peram for user agent, moved termination trap
 # Updated - CLATTA - 2016-11-01 - Changed curl to output headers only
 # Updated - CLATTA - 2017-08-01 - Added useragent_default configurable value
 # Updated - CLATTA - 2017-08-08 - Removed most repeat logic, -r no longer accepts a value
 # Updated - CLATTA - 2018-01-16 - Added headings and needed spacing for columns look
+# Updated - CLATTA - 2019-08-16 - changing echo to printf for compatibilty with Mac terminals
 #
 #
 # CONFIGURABLE
@@ -75,6 +76,7 @@ colornone='\e[0m';
 # DEFINE THE EXIT FUNCTION
 set -e
 function report {
+	echo "";
 	echo "Responded ${responded}";
 	echo "Failed    ${fail} ";
 }
@@ -90,18 +92,18 @@ do
 	# BUILD CURL COMMAND TO GET REPONSE CODE
 	datetime=`date +"%Y%m%d%H%M%S"`
 	response=`curl -I -s -L -A "${useragent}" -w '%{http_code}  %{time_namelookup} x%{num_redirects} %{time_redirect} %{time_connect} %{time_total} %{url_effective}' --stderr /dev/null "${url}" | tail -1`
-	responsecode=`echo ${response} | awk '{print $1}'`
+	responsecode=`printf ${response} | awk '{print $1}'`
 	# IF THERE WAS NO RESPONSE, SAY SO, OTHERWISE PRINT OUTPUT
-	if [[ ${responsecode} == "000" ]] 
+	if [[ ${responsecode} == "000" ]]
 		then
-			echo -e "${colorred}${datetime}" "${url}" "${FAILED}${colornone}";
+			printf "${colorred}${datetime}" "${url}" "${FAILED}${colornone}\n";
 			fail=$((fail+1));
 	elif [[ ${responsecode} == "200" ]]
 		then
-			echo -e "${colornone}${datetime} ${response}${colornone}";
+			printf "${colornone}${datetime} ${response}${colornone}\n";
 			responded=$((responded+1));
 		else
-			echo -e "${coloryellow}${datetime} ${response}${colornone}";
+			printf "${coloryellow}${datetime} ${response}${colornone}\n";
 			responded=$((responded+1));
 	fi
 	# TRAP MANUAL EXIT, WHICH IS PROBABLY THE ONLY WAY THIS STOPS REPEATING
