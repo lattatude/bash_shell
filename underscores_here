@@ -1,0 +1,12 @@
+#! /bin/bash
+# CONVERT SPACES TO UNDERSCORES IN FILE NAMES
+# clatta 2005-10-03, updated 2021-11-27
+#
+file="${1}"
+if [ -n "$file" ]; then
+    echo "Replacing spaces with underscores for file ${file} "
+    mv "$file" "${file// /_}"
+else
+    echo "Replacing spaces with underscores for contents of entire directory"
+    for f in *\ *; do mv "$f" "${f// /_}"; done
+fi
